@@ -1,39 +1,94 @@
 <html>
 <head>
-    <title>Infinite antimatter generator</title>
+    <title>Incremental</title>
   <script>
-    var tickspeed=5;
-    var antimatter=5;
-    ticker = setInterval(myFunction, tickspeed)
+    
+    const developer=true
+
+    var antimatter=0;
+    //tickspeed=20
+    var req_1=10; 
+    var coins=0;
+    var am_increment=1;
+    
     function myFunction() {
-      antimatter*=2;
-      document.getElementById("A").innerHTML = antimatter;
-      if(antimatter>=Infinity){
-        document.getElementById('inf').style.display='block'; // show the button
-        clearInterval(ticker)
-      }
+      antimatter+=am_increment;
+      document.getElementById("antimatter").innerHTML = antimatter; // display the amount of antimatter you have
+      if(antimatter>=req_1){
+        document.getElementById('inf').style.display='block'; // show the" infinity" button
+        document.getElementById('inf').style='height: 50px; width: auto; background-color: black; color:gold; font-size: 20px; border:2px; border-radius:20%'; // infinity button
+        if(Math.floor(antimatter/10)==1){
+            var coin_gettable=1
+            var coin_gettable_plural=''
+            var antimatter_to_spend=10
+        } else{
+            var coin_gettable = Math.floor(antimatter/10);
+            var coin_gettable_plural='s'
+            var antimatter_to_spend=coin_gettable*10
+        }
+        document.getElementById('inf').value='pay '+coin_gettable*10+' antimatter to get '+coin_gettable+' coin'+coin_gettable_plural;
+      
+    } else{
+        document.getElementById('inf').style.display="none"
+    }
     }
 
+    function auto_buy_antimatter(tickspeed){
+        document.getElementById('auto_am').style.display='block'; // show the "autobuy 1/sec" button
+    }
     
-    var ip=0;
+    
     function infin(){
-        if(antimatter>=Infinity){
-            antimatter=1
-            ip+=1
-            document.getElementById("IP").innerHTML = "you have "+ip+" infinity points";
-            document.getElementById('inf').style.display='none'; // hide the button
-            ticker = setInterval(myFunction, tickspeed);
+        document.getElementById('coin_shower').style.display='block'; // show the "you have ... coins"
+        coins+=Math.floor(antimatter/10);
+        antimatter-=Math.floor(antimatter/10)*10;
+        if(coins>1){
+        document.getElementById("s_on_IP").innerHTML = 's'
         }
+        document.getElementById("antimatter").innerHTML = antimatter
+        document.getElementById("coins").innerHTML = coins;
+        document.getElementById('inf').style.display='none'; // hide the button
+        ticker = setInterval(myFunction, tickspeed);
     }
     function start(){
-        document.getElementById('inf').style.display='none'; // hide the button (no)
-        myFunction();
-        
+        document.getElementById('antimatter').innerHTML = antimatter;
+        document.getElementById('inf').style.display='none'; // hide the button
+        document.getElementById('coin_shower').style.display='none'; // hide the "you have ... coins"
+        document.getElementById('gain_ant').value="Gain "+am_increment+" antimatter"
+        document.getElementById("gain_ant").style="width: auto; height: auto; font-size: 15px; border-radius:20px";
+        if(developer==false){document.getElementById("dev_opt").style.display="none";}
+        //myFunction();
+    }
+    function set(type, value){
+        if(type=="inc"){
+            am_increment=parseInt(value);
+            document.getElementById('gain_ant').value="Gain "+am_increment+" antimatter"
+        }
+        else if(type=="am"){
+            antimatter=parseInt(value)
+            document.getElementById('antimatter').innerHTML=antimatter
+        }
+        else if(type=="coins"){
+            coins=parseInt(value)
+            document.getElementById('coin_shower').style.display='block'; // show the "you have ... coins"
+            document.getElementById('coins').innerHTML=coins
+            if(coins>1){
+                document.getElementById("s_on_IP").innerHTML = 's'
+            }
+            else{
+                document.getElementById("s_on_IP").innerHTML = ''
+            }
+        }
+    }
+    function dev_opt(){
+        document.getElementById('dev_opt').style.display="none";
+        document.getElementById('dev_only').style.display="block";
     }
   </script>
   <style>
       body{
-          background-color: darkblue;
+          background-color: rgb(41,41,41);
+          color: lightgray;
       }
       button{
         background-color: #000000;
@@ -47,8 +102,30 @@
   </style>
 </head>
 <body onload="start()">
-  <h1>You have <span id="A"></span> antimatter</h1>
-  <h1><span id="IP"></span></h1>
-  <input type="button" id="inf" style="display:none" onclick="infin()" value="infinity">
+  <h1>You have <span id="antimatter"></span> antimatter</h1>
+  <h1 id="coin_shower">You have <span id="coins"></span> <span style="color:gold">coin<span id="s_on_IP"></span></span></h1>
+  <input type="button" id="gain_ant" onclick="myFunction()" value=><br>
+  <input type="button" id="inf" style="display:none" onclick="infin()">
+  <br><br>
+  <p id="dev_opt">Enable developer options<input type="checkbox" id="developer" onclick="dev_opt()"></p>
+  <br>
+  
+    <details id="dev_only" style="display:none">
+        <summary>developer options</summary>
+      <ul>
+          <li>
+              <p>am_increment: <input type="number" name="new_inc" id="new_inc"><br>
+                <button onclick="set('inc', document.getElementById('new_inc').value)">Set</button></p><br> <!-- set_new_inc(document.getElementById('new_inc').value) -->
+          </li>
+          <li>
+              <p>antimatter: <input type="number" name="am" id="am"><br>
+                <button onclick="set('am', document.getElementById('am').value)">Set</button></p><br>
+          </li>
+          <li>
+              <p>coins: <input type="number" name="coin_set" id="coin_set"><br>
+                <button onclick="set('coins', document.getElementById('coin_set').value)">Set</button></p><br>
+            </li>
+      </ul>
+    </details>
 </body>
 </html>
